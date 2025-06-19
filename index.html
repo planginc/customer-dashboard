@@ -1817,9 +1817,10 @@ function setupFilterHandlers(viewType) {
         }
 
         function handleTrialFilter() {
-            trialDateFilter = document.getElementById('trialDateFilter').value;
-            applyAllFilters();
-        }
+    console.log('Trial filter clicked:', document.getElementById('hitlistTrialFilter').value);
+    trialDateFilter = document.getElementById('hitlistTrialFilter').value;
+    applyAllFilters();
+}
 
         function handleContactFilter() {
             lastContactFilter = document.getElementById('lastContactFilter').value;
