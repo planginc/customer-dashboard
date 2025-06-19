@@ -1827,20 +1827,64 @@ function setupFilterHandlers(viewType) {
         }
 
         function applyAllFilters() {
-            filteredCustomers = allCustomers.filter(customer => {
-                const matchesName = !nameSearchTerm || 
-                    customer.customer_name.toLowerCase().includes(nameSearchTerm) ||
-                    (customer.organization_name && customer.organization_name.toLowerCase().includes(nameSearchTerm));
-                
-                return matchesName; // Simplified for now
-            });
-            
-            if (currentSortField) {
-                sortCustomers();
+    // Get current filter values - use correct IDs based on current view
+    const currentTrialFilter = document.getElementById('hitlistTrialFilter')?.value || '';
+    const currentCallbackFilter = document.getElementById('hitlistCallbackFilter')?.value || '';
+    const currentNameSearch = document.getElementById('hitlistNameSearch')?.value?.toLowerCase() || '';
+    
+    filteredHitList = hitListCustomers.filter(customer => {
+        // Name/organization search
+        const matchesName = !currentNameSearch || 
+            customer.customer_name.toLowerCase().includes(currentNameSearch) ||
+            (customer.organization_name && customer.organization_name.toLowerCase().includes(currentNameSearch));
+        
+        // Trial status filter
+        let matchesTrial = true;
+        if (currentTrialFilter) {
+            const daysLeft = customer.trial_days_remaining;
+            switch(currentTrialFilter) {
+                case 'expired':
+                    matchesTrial = daysLeft <= 0;
+                    break;
+                case 'urgent':
+                    matchesTrial = daysLeft > 0 && daysLeft <= 7;
+                    break;
+                case 'warning':
+                    matchesTrial = daysLeft > 7 && daysLeft <= 14;
+                    break;
+                case 'active':
+                    matchesTrial = daysLeft > 14;
+                    break;
             }
-            
-            displayCustomerList();
         }
+        
+        // Callback filter
+        let matchesCallback = true;
+        if (currentCallbackFilter) {
+            const today = getTodayLocalDate();
+            const callbackDate = customer.next_callback_date;
+            switch(currentCallbackFilter) {
+                case 'today':
+                    matchesCallback = callbackDate === today;
+                    break;
+                case 'overdue':
+                    matchesCallback = callbackDate && callbackDate < today;
+                    break;
+                case 'thisweek':
+                    // Simple week check - you can make this more sophisticated
+                    matchesCallback = callbackDate && callbackDate >= today;
+                    break;
+                case 'scheduled':
+                    matchesCallback = !!callbackDate;
+                    break;
+            }
+        }
+        
+        return matchesName && matchesTrial && matchesCallback;
+    });
+    
+    displayHitList();
+}
 
         function setSingleSort(field, direction) {
             document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
