@@ -1775,14 +1775,41 @@
 
         // Search and filter functions (simplified for space)
         function setupSearchHandlers() {
-            const nameSearch = document.getElementById('customerNameSearch');
-            const trialFilter = document.getElementById('trialDateFilter');
-            const contactFilter = document.getElementById('lastContactFilter');
-            
-            if (nameSearch) nameSearch.addEventListener('input', handleNameSearch);
-            if (trialFilter) trialFilter.addEventListener('change', handleTrialFilter);
-            if (contactFilter) contactFilter.addEventListener('change', handleContactFilter);
-        }
+    // Set up handlers for all possible filter dropdowns across all views
+    setupFilterHandlers('hitlist');
+    setupFilterHandlers('targetleads'); 
+    setupFilterHandlers('allCustomers');
+}
+
+function setupFilterHandlers(viewType) {
+    const searchInput = document.getElementById(viewType + 'Search') || 
+                       document.getElementById(viewType + 'NameSearch');
+    const trialFilter = document.getElementById(viewType + 'TrialFilter');
+    const callbackFilter = document.getElementById(viewType + 'CallbackFilter');
+    const statusFilter = document.getElementById(viewType + 'StatusFilter');
+    const sourceFilter = document.getElementById(viewType + 'LeadSourceFilter');
+    
+    if (searchInput) {
+        searchInput.removeEventListener('input', handleSearch);
+        searchInput.addEventListener('input', handleSearch);
+    }
+    if (trialFilter) {
+        trialFilter.removeEventListener('change', handleTrialFilter);
+        trialFilter.addEventListener('change', handleTrialFilter);
+    }
+    if (callbackFilter) {
+        callbackFilter.removeEventListener('change', handleCallbackFilter);
+        callbackFilter.addEventListener('change', handleCallbackFilter);
+    }
+    if (statusFilter) {
+        statusFilter.removeEventListener('change', handleStatusFilter);
+        statusFilter.addEventListener('change', handleStatusFilter);
+    }
+    if (sourceFilter) {
+        sourceFilter.removeEventListener('change', handleSourceFilter);
+        sourceFilter.addEventListener('change', handleSourceFilter);
+    }
+}
 
         function handleNameSearch() {
             nameSearchTerm = document.getElementById('customerNameSearch').value.toLowerCase();
